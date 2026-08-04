@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { firebaseDB, firebaseLooper, firebaseTeams } from '../../../../firebase';
+import { getCollection, getItem } from '../../../../firebase';
+import { assetUrl } from '../../../../config';
 
 import styles from '../../articles.css';
 import Header from './header';
@@ -7,22 +8,18 @@ import Header from './header';
 class NewsArticles extends Component {
     state = {
         article: [],
-        team: []
+        team: [],
+        error: ''
     }
 
     componentWillMount() {
-        firebaseDB.ref(`articles/${this.props.match.params.id}`).once('value')
-            .then((snapshot) => {
-                let article = snapshot.val();
-                firebaseTeams.orderByChild('teamId').equalTo(article.team).once('value')
-                    .then((snapshot) => {
-                        const team = firebaseLooper(snapshot)
-                        this.setState({
-                            article,
-                            team
-                        })
-                    })
-            })
+        getItem('articles', this.props.match.params.id)
+            .then((article) => Promise.all([
+                article,
+                getCollection('teams', { orderBy: 'teamId', equalTo: article.team })
+            ]))
+            .then(([article, team]) => this.setState({ article, team }))
+            .catch(() => this.setState({ error: 'Unable to load this article.' }))
     }
 
     render() {
@@ -31,6 +28,7 @@ class NewsArticles extends Component {
 
         return (
             <div className={styles.articleWrapper}>
+                {this.state.error && <p role="alert">{this.state.error}</p>}
                 <Header
                     teamData={team[0]}
                     date={article.date}
@@ -40,7 +38,7 @@ class NewsArticles extends Component {
                     <h1>{article.title}</h1>
                     <div className={styles.articleImage}
                         style={{
-                            background: `url('/images/articles/${article.image}')`
+                            background: article.image ? `url('${assetUrl(`images/articles/${article.image}`)}')` : 'none'
                         }}
                     ></div>
                     <div className={styles.articleText}>

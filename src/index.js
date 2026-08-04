@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { BrowserRouter } from 'react-router-dom';
+import { HashRouter } from 'react-router-dom';
 import Routes from './routes'
 import { firebase } from './firebase';
 
@@ -11,9 +11,9 @@ library.add(faBars, faHome, faPlay, faSignInAlt, faSignOutAlt, faNewspaper, faCl
 
 const App = (props) => {
     return (
-        <BrowserRouter>
+        <HashRouter>
             <Routes {...props}/>
-        </BrowserRouter>
+        </HashRouter>
     )
 }
 

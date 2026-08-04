@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/static/css/main.0cebf5f4.chunk.css",
-    "main.js": "/static/js/main.e1b61770.chunk.js",
-    "main.js.map": "/static/js/main.e1b61770.chunk.js.map",
-    "runtime~main.js": "/static/js/runtime~main.a8a9905a.js",
-    "runtime~main.js.map": "/static/js/runtime~main.a8a9905a.js.map",
-    "static/js/2.dac526a3.chunk.js": "/static/js/2.dac526a3.chunk.js",
-    "static/js/2.dac526a3.chunk.js.map": "/static/js/2.dac526a3.chunk.js.map",
-    "index.html": "/index.html",
-    "precache-manifest.0c2b95416eb186eebc525731f0df3f9c.js": "/precache-manifest.0c2b95416eb186eebc525731f0df3f9c.js",
-    "service-worker.js": "/service-worker.js",
-    "static/css/main.0cebf5f4.chunk.css.map": "/static/css/main.0cebf5f4.chunk.css.map"
+    "main.css": "/react_NBA_app/static/css/main.27eff856.chunk.css",
+    "main.js": "/react_NBA_app/static/js/main.21cafd90.chunk.js",
+    "main.js.map": "/react_NBA_app/static/js/main.21cafd90.chunk.js.map",
+    "runtime~main.js": "/react_NBA_app/static/js/runtime~main.70e20d04.js",
+    "runtime~main.js.map": "/react_NBA_app/static/js/runtime~main.70e20d04.js.map",
+    "static/js/2.18b3273c.chunk.js": "/react_NBA_app/static/js/2.18b3273c.chunk.js",
+    "static/js/2.18b3273c.chunk.js.map": "/react_NBA_app/static/js/2.18b3273c.chunk.js.map",
+    "index.html": "/react_NBA_app/index.html",
+    "precache-manifest.309a039396a5087054a3af27b6ec6c52.js": "/react_NBA_app/precache-manifest.309a039396a5087054a3af27b6ec6c52.js",
+    "service-worker.js": "/react_NBA_app/service-worker.js",
+    "static/css/main.27eff856.chunk.css.map": "/react_NBA_app/static/css/main.27eff856.chunk.css.map"
   }
 }

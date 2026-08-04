@@ -1,4 +1,5 @@
-import * as firebase from 'firebase';
+import firebase from 'firebase/compat/app';
+import 'firebase/compat/auth';
 
 const config = {
     apiKey: "AIzaSyCibtXgxI_ZWqKvAze0zz3owXVJsnLU-to",
@@ -11,28 +12,57 @@ const config = {
 
 firebase.initializeApp(config);
 
-const firebaseDB = firebase.database();
-const firebaseArticles = firebaseDB.ref('articles');
-const firebaseTeams = firebaseDB.ref('teams');
-const firebaseVideos = firebaseDB.ref('videos');
+const databaseUrl = config.databaseURL.replace(/\/$/, '');
 
-const firebaseLooper = (snapshot) => {
-    const data = [];
-    snapshot.forEach((childSnapshot) => {
-        data.push({
-            ...childSnapshot.val(),
-            id: childSnapshot.key
-        })
-    });
-    return data;
+const requestJson = async (path) => {
+    const response = await fetch(`${databaseUrl}/${path}.json`);
+
+    if (!response.ok) {
+        throw new Error(`NBA data request failed (${response.status})`);
+    }
+
+    return response.json();
 }
+
+const normalizeCollection = (data) => Object.keys(data || {}).map((key) => ({
+    ...data[key],
+    sourceId: data[key].id,
+    id: key
+}));
+
+const fieldValue = (item, field) => field === 'id' ? item.sourceId : item[field];
+
+const getCollection = async (collection, options = {}) => {
+    let items = normalizeCollection(await requestJson(collection));
+
+    if (options.orderBy) {
+        items.sort((a, b) => fieldValue(a, options.orderBy) - fieldValue(b, options.orderBy));
+    }
+
+    if (options.startAt !== undefined) {
+        items = items.filter((item) => fieldValue(item, options.orderBy) >= options.startAt);
+    }
+
+    if (options.endAt !== undefined) {
+        items = items.filter((item) => fieldValue(item, options.orderBy) <= options.endAt);
+    }
+
+    if (options.equalTo !== undefined) {
+        items = items.filter((item) => fieldValue(item, options.orderBy) === options.equalTo);
+    }
+
+    if (options.limit) {
+        items = items.slice(0, options.limit);
+    }
+
+    return items;
+}
+
+const getItem = (collection, id) => requestJson(`${collection}/${id}`);
 
 
 export {
     firebase,
-    firebaseDB,
-    firebaseArticles,
-    firebaseTeams,
-    firebaseVideos,
-    firebaseLooper
+    getCollection,
+    getItem
 }

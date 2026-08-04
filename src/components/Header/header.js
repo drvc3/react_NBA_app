@@ -4,12 +4,13 @@ import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import SideNav from './SideNav/sideNav.js'
+import { assetUrl } from '../../config';
 
 const Header = (props) => {
 
     const logo = () => (
         <Link to="/" className={style.logo}>
-            <img alt="NBA logo" src="/images/nba_logo.png" />
+            <img alt="NBA logo" src={assetUrl('images/nba_logo.png')} />
         </Link>
     )
 
