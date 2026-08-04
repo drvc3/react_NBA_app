@@ -1,11 +1,12 @@
 import React from 'react';
 import styles from '../articles.css';
+import { assetUrl } from '../../../config';
 
 const teamInfo = (props) => (
     <div className={styles.articleTeamHeader}>
         <div className={styles.left}
             style={{
-                background: `url('/images/teams/${props.team.logo}')`
+                background: `url('${assetUrl(`images/teams/${props.team.logo}`)}')`
             }}
         ></div>
         <div className={styles.right}>
@@ -22,4 +23,3 @@ const teamInfo = (props) => (
 )
 
 export default teamInfo;
-

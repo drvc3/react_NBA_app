@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 
 import Slick from 'react-slick';
 import style from './slider.css'
+import { assetUrl } from '../../../config';
 
 const SliderTemplates = (props) => {
 
@@ -26,7 +27,7 @@ const SliderTemplates = (props) => {
                         <div className={style.featured_item}>
                             <div className={style.featured_image}
                                 style={{
-                                    background: `url(../images/articles/${item.image})`
+                                    background: `url('${assetUrl(`images/articles/${item.image}`)}')`
                                 }}></div>
                             <Link to={`/articles/${item.id}`}>
                                 <div className={style.featured_caption}>

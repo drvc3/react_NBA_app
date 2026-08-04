@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { firebaseDB, firebaseLooper, firebaseTeams, firebaseVideos } from '../../../../firebase';
+import { getCollection, getItem } from '../../../../firebase';
 
 import styles from '../../articles.css';
 import Header from './header';
@@ -11,38 +11,27 @@ class VideoArticle extends Component {
         article: [],
         team: [],
         teams: [],
-        related: []
+        related: [],
+        error: ''
     }
 
     componentWillMount() {
-        firebaseDB.ref(`videos/${this.props.match.params.id}`).once('value')
-            .then((snapshot) => {
-                let article = snapshot.val();
-                firebaseTeams.orderByChild('teamId').equalTo(article.team).once('value')
-                    .then((snapshot) => {
-                        const team = firebaseLooper(snapshot)
-                        this.setState({
-                            article,
-                            team
-                        })
-                        this.getRelated();
-                    })
-            })
+        getItem('videos', this.props.match.params.id)
+            .then((article) => Promise.all([
+                article,
+                getCollection('teams', { orderBy: 'teamId', equalTo: article.team })
+            ]))
+            .then(([article, team]) => this.setState({ article, team }, this.getRelated))
+            .catch(() => this.setState({ error: 'Unable to load this video.' }))
     }
 
     getRelated = () => {
-        firebaseTeams.once('value')
-            .then((snapshot) => {
-                const teams = firebaseLooper(snapshot);
-                firebaseVideos.orderByChild("team").equalTo(this.state.article.team).limitToFirst(3).once('value')
-                    .then((snapshot) => {
-                        const related = firebaseLooper(snapshot);
-                        this.setState({
-                            teams,
-                            related
-                        })
-                    })
-            })
+        Promise.all([
+            getCollection('teams'),
+            getCollection('videos', { orderBy: 'team', equalTo: this.state.article.team, limit: 3 })
+        ])
+            .then(([teams, related]) => this.setState({ teams, related }))
+            .catch(() => this.setState({ error: 'Unable to load related videos.' }))
 
 
         // axios.get(`${URL}/teams`)
@@ -65,6 +54,7 @@ class VideoArticle extends Component {
 
         return (
             <div>
+                {this.state.error && <p role="alert">{this.state.error}</p>}
                 <Header teamData={team[0]} />
                 <div className={styles.videoWrapper}>
                     <h1>{article.title}</h1>

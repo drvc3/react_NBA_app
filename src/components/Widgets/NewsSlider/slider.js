@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { firebaseArticles, firebaseLooper } from '../../../firebase';
+import { getCollection } from '../../../firebase';
 
 import SliderTemplates from './slider_templates';
 
@@ -7,22 +7,20 @@ import SliderTemplates from './slider_templates';
 class NewsSlider extends Component {
 
     state = {
-        news: []
+        news: [],
+        error: ''
     }
 
     componentWillMount() {
-        firebaseArticles.limitToFirst(3).once('value')
-            .then((snapshot) => {
-                const news = firebaseLooper(snapshot);
-                this.setState({
-                    news
-                })
-            })
+        getCollection('articles', { limit: 3 })
+            .then((news) => this.setState({ news }))
+            .catch(() => this.setState({ error: 'Unable to load featured news.' }))
     }
 
     render() {
         return (
             <div>
+                {this.state.error && <p role="alert">{this.state.error}</p>}
                 <SliderTemplates data={this.state.news} type={this.props.type} settings={this.props.settings} />
             </div>
         )

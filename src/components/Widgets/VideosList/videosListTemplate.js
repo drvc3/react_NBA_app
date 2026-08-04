@@ -3,6 +3,7 @@ import styles from './videosList.css';
 
 import { Link } from 'react-router-dom';
 import CardInfo from '../CardInfo/cardinfo';
+import { assetUrl } from '../../../config';
 
 
 const VideosListTemplate = (props) => {
@@ -11,10 +12,10 @@ const VideosListTemplate = (props) => {
             <div className={styles.videoListItem_wrapper}>
                 <div className={styles.left}
                     style={{
-                        background: `url(/images/videos/${item.image})`
+                        background: `url('${assetUrl(`images/videos/${item.image}`)}')`
                     }}
                 >
-                <div></div>
+                <div style={{ backgroundImage: `url('${assetUrl('images/play.png')}')` }}></div>
                 </div>
                 <div className={styles.right}>
                     <CardInfo

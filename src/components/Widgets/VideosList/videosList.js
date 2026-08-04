@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import styles from './videosList.css';
-import { firebaseTeams, firebaseVideos, firebaseLooper } from '../../../firebase';
+import { getCollection } from '../../../firebase';
 
 import Button from '../Buttons/buttons';
 import VideosTemplate from './videosListTemplate';
@@ -11,7 +11,8 @@ class VideosList extends Component {
         videos: [],
         start: this.props.start,
         end: this.props.start + this.props.amount,
-        amount: this.props.amount
+        amount: this.props.amount,
+        error: ''
     }
 
     componentWillMount() {
@@ -20,26 +21,19 @@ class VideosList extends Component {
 
     request = (start, end) => {
         if (this.state.teams.length < 1) {
-            firebaseTeams.once('value')
-                .then((snapshot) => {
-                    const teams = firebaseLooper(snapshot);
-                    this.setState({
-                        teams
-                    })
-                })
+            getCollection('teams')
+                .then((teams) => this.setState({ teams }))
+                .catch(() => this.setState({ error: 'Unable to load team data.' }))
         }
-        firebaseVideos.orderByChild("id").startAt(start).endAt(end).once('value')
-            .then((snapshot) => {
-                const videos = firebaseLooper(snapshot);
+        getCollection('videos', { orderBy: 'id', startAt: start, endAt: end })
+            .then((videos) => {
                 this.setState({
                     videos: [...this.state.videos, ...videos],
                     start,
                     end
                 })
             })
-            .catch(e => {
-                console.log(e);
-            })
+            .catch(() => this.setState({ error: 'Unable to load videos.' }))
     }
 
     renderVideos = () => {
@@ -77,6 +71,7 @@ class VideosList extends Component {
     render() {
         return (
             <div className={styles.videoList_wrapper}>
+                {this.state.error && <p role="alert">{this.state.error}</p>}
                 {this.renderTitle()}
                 {this.renderVideos()}
                 {this.renderButton()}

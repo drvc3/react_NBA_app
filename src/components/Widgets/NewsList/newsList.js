@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import { Link } from 'react-router-dom';
-import { firebaseTeams, firebaseArticles, firebaseLooper } from '../../../firebase';
+import { getCollection } from '../../../firebase';
+import { assetUrl } from '../../../config';
 
 import styles from './newsList.css';
 
@@ -14,7 +15,8 @@ class NewsList extends Component {
         items: [],
         start: this.props.start,
         end: this.props.start + this.props.amount,
-        amount: this.props.amount
+        amount: this.props.amount,
+        error: ''
     }
 
     componentWillMount() {
@@ -23,26 +25,19 @@ class NewsList extends Component {
 
     request = (start, end) => {
         if (this.state.teams.length < 1) {
-            firebaseTeams.once('value')
-                .then((snapshot) => {
-                    const teams = firebaseLooper(snapshot);
-                    this.setState({
-                        teams
-                    })
-                })
+            getCollection('teams')
+                .then((teams) => this.setState({ teams }))
+                .catch(() => this.setState({ error: 'Unable to load team data.' }))
         }
-        firebaseArticles.orderByChild("id").startAt(start).endAt(end).once('value')
-            .then((snapshot) => {
-                const articles = firebaseLooper(snapshot);
+        getCollection('articles', { orderBy: 'id', startAt: start, endAt: end })
+            .then((articles) => {
                 this.setState({
                     items: [...this.state.items, ...articles],
                     start,
                     end
                 })
             })
-            .catch(e => {
-                console.log(e);
-            })
+            .catch(() => this.setState({ error: 'Unable to load news.' }))
     }
 
     loadMore = () => {
@@ -94,7 +89,7 @@ class NewsList extends Component {
                             <div className={styles.flex_wrapper}>
                                 <div className={styles.left}
                                     style={{
-                                        background: `url('/images/articles/${item.image}')`
+                                        background: `url('${assetUrl(`images/articles/${item.image}`)}')`
                                     }}>
                                     <div></div>
                                 </div>
@@ -120,6 +115,7 @@ class NewsList extends Component {
     render() {
         return (
             <div>
+                {this.state.error && <p role="alert">{this.state.error}</p>}
                 <TransitionGroup
                     component="div"
                     className="list"
